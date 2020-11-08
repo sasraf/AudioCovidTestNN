@@ -1,20 +1,27 @@
 import torch
+import numpy as np
 
 class AudioClassifier:
     def __init__(self, inputEpochs, learningRate):
         self.model = torch.nn.Sequential(
             torch.nn.Linear(40, 15),
-            torch.nn.ReLU(),
-            torch.nn.Linear(15,2),
-            torch.nn.Softmax()
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(15, 2),
+            torch.nn.Sigmoid()
         )
 
         self.lossFunction = torch.nn.MSELoss()
         self.epochs = inputEpochs
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learningRate)
 
+    def save(self, nameForSaving):
+        torch.save(self.model.state_dict(), "/models/" + nameForSaving + ".txt")
+
+    def load(self, modelName):
+        self.model = torch.load("/models/" + modelName + ".txt")
+
     def feedForward(self, inputArray):
-        return self.model(inputArray)
+        return self.model(inputArray).numpy()
 
     def train(self, inputData, expectedOutputs, debug):
         for t in range(self.epochs):
