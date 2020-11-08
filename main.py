@@ -10,6 +10,7 @@ import AudioClassifier
 # {x,y} = {1, 0}. If they're negative {x, y} = {0, 1}. For each F1, we train our model, then we clear both lists and move to the next F1 until done.
 # Once finished, we save our model and test. We'll save folder 20200525 as our testing data set
 
+
 # We repeat this for each feature that we're looking at: phonation, breathing, deep cough, shallow cough, etc
 
 # If the audio feature is missing, then don't append anything to either list
