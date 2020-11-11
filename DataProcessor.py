@@ -2,6 +2,7 @@ import librosa
 import os
 import numpy as np
 import pandas as pd
+import time
 
 from glob import glob
 
@@ -42,11 +43,12 @@ class DataPreprocessor:
         csvPath = currentF1Path + os.path.basename(os.path.normpath(currentF1Path)) + ".csv"
         csvFile = pd.read_csv(csvPath)
 
-        if self.debug == True:
-            print("Step: " + str(self.F1StepCount))
+        if self.debug:
+            start = time.time()
+            print("Step: " + str(self.F1StepCount) + "/" + str(len(self.F1)))
             print("Current Path: " + currentF1Path)
-            print("CSV Path: " + csvPath)
-            print("F2Dirs: \n\n")
+            # print("CSV Path: " + csvPath)
+            # print("F2Dirs: \n\n")
 
         self.F1StepCount += 1
 
@@ -54,38 +56,29 @@ class DataPreprocessor:
         for dirPath in F2Dirs:
             filePath = dirPath + self.audioFileName
 
-            if self.debug == True:
-                print("filePath: " + filePath)
+            # if self.debug:
+                # print("filePath: " + filePath)
 
             # Gets and stores mfccs of audio file
-            # In debug mode, tracks if sampling fails, writes down which files it failed with
-            if self.debug:
-                try:
-                    audio, sampleRate = librosa.load(filePath)
-                    mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
-                except:
-                    f = open("failedFeatures.txt", "a")
-                    f.write(filePath + "\n")
-                    f.close()
-            else:
-                    audio, sampleRate = librosa.load(filePath)
-                    mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
+            # For any missing audio files/damaged audio files, skip
+            try:
+                audio, sampleRate = librosa.load(filePath)
+                mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
+                self.inputData.append(mfccs)
 
+                # Gets last directory in the path dirPath (this gives us the individual's identifier)
+                id = os.path.basename(os.path.normpath(dirPath))
 
-            self.inputData.append(mfccs)
+                # Turns covidStatus val (a string) from dataframe into an ordered set so that {1,0} = pos, {0, 1} = neg, appends tou expectedOutputs
+                # covidStatus = csvFile._get_value(id, 'covid_status')
+                covidStatus = csvFile.loc[csvFile['id'] == id]['covid_status'].iloc[0]
+                covidStatus = self.covidStatusStringToStatusArray(covidStatus)
+                self.expectedOutputs.append(covidStatus)
+            except:
+                pass
 
-            # TODO: process expectedOutputs, append
-            # Gets last directory in the path dirPath (this gives us the individual's identifier)
-            id = os.path.basename(os.path.normpath(dirPath))
-
-            # Turns covidStatus val (a string) from dataframe into an ordered set so that {1,0} = pos, {0, 1} = neg, appends tou expectedOutputs
-            # covidStatus = csvFile._get_value(id, 'covid_status')
-            covidStatus = csvFile.loc[csvFile['id'] == id]['covid_status'].iloc[0]
-            # covidStatus = covidStatus.iloc[0]
-            print(covidStatus)
-            covidStatus = self.covidStatusStringToStatusArray(covidStatus)
-            self.expectedOutputs.append(covidStatus)
-
+        if self.debug:
+            print("Time for Step: " + str(time.time() - start) + "seconds")
         return True
 
     # Given a string covidStatus from 'covid_status" in our csvs, determine if the person is pos/neg and return
