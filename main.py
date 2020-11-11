@@ -2,7 +2,9 @@ import librosa
 import torch
 import pandas as pd
 import matplotlib as plt
-import AudioClassifier
+import time
+
+from DataProcessor import DataPreprocessor
 
 # First we need to iterate through all our dataset folders. For each of the folders (let's call them F1), there is a CSV and subfolders (calle them F2).
 # Load some audio file (maybe start with the deep cough audio files first) into memory by appending its mfcc values as a single object to a list and
@@ -19,23 +21,40 @@ import AudioClassifier
 # creating a metalearner that we train over our set of audio-classifiers.
 
 
+start = time.time()
+
+x = True
+
+dp = DataPreprocessor('cough-heavy.wav', True)
+
+while x == True:
+    x = dp.getF1Data()
+
+end = time.time()
+
+print(x)
+
+print("This test took " + str(end - start) + " seconds")
+
+
+
 # Librosa preprocessing example
 
-fn = 'data/20200413/aGEXEhp3mbUandZBtCuEooDQrK53/cough-heavvy.wav'
-
-librosa_audio, librosa_sample_rate = librosa.load(fn)
-mfccs = librosa.feature.mfcc(y=librosa_audio, sr=librosa_sample_rate, n_mfcc = 40)
-
-
-print(mfccs.shape)
-print(mfccs)
-
-plt.figure(figsize=(10, 4))
-librosa.display.specshow(mfccs, x_axis='time')
-plt.colorbar()
-plt.title('MFCC')
-plt.tight_layout()
-plt.show()
-
+# fn = 'data/20200413/aGEXEhp3mbUandZBtCuEooDQrK53/cough-heavvy.wav'
+#
+# librosa_audio, librosa_sample_rate = librosa.load(fn)
+# mfccs = librosa.feature.mfcc(y=librosa_audio, sr=librosa_sample_rate, n_mfcc = 40)
+#
+#
+# print(mfccs.shape)
+# print(mfccs)
+#
+# plt.figure(figsize=(10, 4))
+# librosa.display.specshow(mfccs, x_axis='time')
+# plt.colorbar()
+# plt.title('MFCC')
+# plt.tight_layout()
+# plt.show()
+#
 
 exit(0)

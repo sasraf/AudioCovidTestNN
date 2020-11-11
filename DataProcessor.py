@@ -1,13 +1,14 @@
-import pandas as pd
 import librosa
 import os
+import numpy as np
+import pandas as pd
 
 from glob import glob
 
 # DataPreProcessor is used to extract and process data from our data folder for training
 
 class DataPreprocessor:
-    def __init__(self, audioFileName):
+    def __init__(self, audioFileName, debug):
         self.inputData = list()
         self.expectedOutputs = list()
         self.audioFileName = audioFileName
@@ -17,6 +18,11 @@ class DataPreprocessor:
 
         # Used to track which folder in /data/ we're on
         self.F1StepCount = 0
+
+        # Key of covid statuses for turning strings from csv into integers to plug into neural network
+        self.covidStatusKey = self.fillCovidStatusKey()
+
+        self.debug = debug
 
     # Get all of the data from a single top level F1 folder and save it to our inputData and expectedOutputs
     # If data was retrieved, return true. Else if all data is retreived return false
@@ -33,7 +39,14 @@ class DataPreprocessor:
         F2Dirs = glob(currentF1Path + "*/")
 
         # Stores csv file as pd dataframe
-        csvFile = pd.read_csv(currentF1Path + os.path.basename(os.path.normpath(currentF1Path)) + ".csv")
+        csvPath = currentF1Path + os.path.basename(os.path.normpath(currentF1Path)) + ".csv"
+        csvFile = pd.read_csv(csvPath)
+
+        if self.debug == True:
+            print("Step: " + str(self.F1StepCount))
+            print("Current Path: " + currentF1Path)
+            print("CSV Path: " + csvPath)
+            print("F2Dirs: \n\n")
 
         self.F1StepCount += 1
 
@@ -41,29 +54,56 @@ class DataPreprocessor:
         for dirPath in F2Dirs:
             filePath = dirPath + self.audioFileName
 
-            # Gets and stores mfccs of audio file
-            audio, sampleRate = librosa.load(filePath)
-            mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
-            self.inputData.append(mfccs)
+            if self.debug == True:
+                print("filePath: " + filePath)
 
+            # Gets and stores mfccs of audio file
+            # In debug mode, tracks if sampling fails, writes down which files it failed with
+            if self.debug:
+                try:
+                    audio, sampleRate = librosa.load(filePath)
+                    mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
+                except:
+                    f = open("failedFeatures.txt", "a")
+                    f.write(filePath + "\n")
+                    f.close()
+            else:
+                    audio, sampleRate = librosa.load(filePath)
+                    mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
+
+
+            self.inputData.append(mfccs)
 
             # TODO: process expectedOutputs, append
             # Gets last directory in the path dirPath (this gives us the individual's identifier)
             id = os.path.basename(os.path.normpath(dirPath))
 
             # Turns covidStatus val (a string) from dataframe into an ordered set so that {1,0} = pos, {0, 1} = neg, appends tou expectedOutputs
-            covidStatus = csvFile._get_value(id, 'covid_status')
+            # covidStatus = csvFile._get_value(id, 'covid_status')
+            covidStatus = csvFile.loc[csvFile['id'] == id]['covid_status'].iloc[0]
+            # covidStatus = covidStatus.iloc[0]
+            print(covidStatus)
             covidStatus = self.covidStatusStringToStatusArray(covidStatus)
             self.expectedOutputs.append(covidStatus)
 
         return True
 
-
-    # TODO: return values based off of these reqs: If the person is currently positive, {x,y} = {1, 0}. If they're negative {x, y} = {0, 1}
     # Given a string covidStatus from 'covid_status" in our csvs, determine if the person is pos/neg and return
     # {x,y} = {1,0} = pos or {x,y} = {0,1} = neg. If encountered with a value never seen before, throw an error.
-    def __covidStatusStringToStatusArray(self, covidStatus):
-        return False
+    def covidStatusStringToStatusArray(self, covidStatus):
+        return self.covidStatusKey[covidStatus]
+
+    def fillCovidStatusKey(self):
+        key = {}
+        # TODO: consider moving positive_asymp to a sign of covid negative -> focus on training ONLY for distinguishing between covid and non covid resp illnesses
+        positive = {'positive_mild', 'positive_asymp', 'positive_moderate'}
+        negative = {'healthy', 'resp_illness_not_identified', 'no_resp_illness_exposed', 'recovered_full'}
+        for item in positive:
+            key[item] = np.array([1, 0])
+        for item in negative:
+            key[item] = np.array([0, 1])
+        return key
+
 
 
     # TODO: get function for inputData, expectedOutput
