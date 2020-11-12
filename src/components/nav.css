@@ -1,0 +1,9 @@
+.nav-container {
+  padding: 20px;
+  text-align: right;
+  color: #BEFBFF;
+  font-weight: 800;
+  z-index: 1;
+  position: absolute;
+  text-decoration: none;
+  }

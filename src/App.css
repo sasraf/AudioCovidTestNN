@@ -1,0 +1,15 @@
+.App {
+  text-align: left;
+  background-color: #00A9BC;
+  
+}
+
+.container-part {
+  height: "50%";
+}
+.name {
+  padding-top: 2rem;
+  padding-bottom: 2.5rem;
+  color: #BEFBFF;
+  text-align: center
+}
