@@ -4,11 +4,33 @@ import numpy as np
 class AudioClassifier:
     def __init__(self, inputEpochs, learningRate):
         self.model = torch.nn.Sequential(
-            torch.nn.Linear(40, 15),
+            torch.nn.Linear(51600, 500),
             torch.nn.Sigmoid(),
-            torch.nn.Linear(15, 2),
+            torch.nn.Linear(500, 30),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(30, 2),
             torch.nn.Sigmoid()
+        #     torch.nn.Linear(256,128),
+        #     torch.nn.ReLU(),
+        #     torch.nn.Dropout(.5),
+        #     torch.nn.Linear(128,2),
+        #     torch.nn.ReLU(),
+        #     torch.nn.Dropout(.5),
+        #     torch.nn.Sigmoid()
         )
+
+        # model = Sequential()
+        # model.add(Dense(256))
+        # model.add(Activation('relu'))
+        # model.add(Dropout(0.5))
+        # model.add(Dense(256))
+        # model.add(Activation('relu'))
+        # model.add(Dropout(0.5))
+        # model.add(Dense(num_labels))
+        # model.add(Activation('softmax'))
+        # # Compile the model
+        # model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
+
 
         self.lossFunction = torch.nn.MSELoss()
         self.epochs = inputEpochs

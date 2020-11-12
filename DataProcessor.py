@@ -25,6 +25,13 @@ class DataPreprocessor:
 
         self.debug = debug
 
+        self.maxDuration = 0
+
+    def getInputData(self):
+        return self.inputData
+    def getExpectedOutputs(self):
+        return self.expectedOutputs
+
     # Get all of the data from a single top level F1 folder and save it to our inputData and expectedOutputs
     # If data was retrieved, return true. Else if all data is retreived return false
     # TODO in main: Iterate through every F1 folder by doing x = true \n while(x){ x = getF1Data } \n get input vals, get output vals
@@ -63,6 +70,12 @@ class DataPreprocessor:
             # For any missing audio files/damaged audio files, skip
             try:
                 audio, sampleRate = librosa.load(filePath)
+
+                if self.debug:
+                    if self.maxDuration < librosa.get_duration(y=audio, sr=sampleRate):
+                        self.maxDuration = librosa.get_duration(y=audio, sr=sampleRate)
+                        print(self.maxDuration)
+
                 mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
                 self.inputData.append(mfccs)
 
@@ -75,7 +88,8 @@ class DataPreprocessor:
                 covidStatus = self.covidStatusStringToStatusArray(covidStatus)
                 self.expectedOutputs.append(covidStatus)
             except:
-                pass
+                if self.debug:
+                    print(filePath + " was passed")
 
         if self.debug:
             print("Time for Step: " + str(time.time() - start) + "seconds")
