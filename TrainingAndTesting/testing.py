@@ -1,15 +1,7 @@
-import pathlib
-
-import librosa
 import torch
-import pandas as pd
-import matplotlib as plt
 import time
 import pickle
 import numpy as np
-
-from AudioClassifier import AudioClassifier
-from DataProcessor import DataPreprocessor
 
 # First we need to iterate through all our dataset folders. For each of the folders (let's call them F1), there is a CSV and subfolders (calle them F2).
 # Load some audio file (maybe start with the deep cough audio files first) into memory by appending its mfcc values as a single object to a list and

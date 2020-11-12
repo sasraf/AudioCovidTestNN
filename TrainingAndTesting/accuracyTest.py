@@ -2,7 +2,7 @@ import torch
 import pickle
 import numpy as np
 
-model = pickle.load(open("Models/model(L1).txt", "rb"))
+model = pickle.load(open("../Models/model(L1).txt", "rb"))
 inputData = pickle.load(open("coswaraInputs.txt", "rb"))
 expectedOutputs = pickle.load(open("coswaraExpectedOutputs.txt", "rb"))
 
