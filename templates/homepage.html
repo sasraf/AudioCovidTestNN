@@ -39,25 +39,22 @@
         </nav>
 
         <div class="jumbotron text-center">
-          <h1></h1>
-          <p>Choose from our selections!</p>
+          <h1>Get tested Now!</h1>
+          <p></p>
         </div>
 
         <div class="container-fluid">
           <div class="row">
-            <!--<div class="col-sm-4">-->
-            <!--  <h2>Library</h2>-->
-            <!--  <p>Download a book from our existing library!</p>-->
-            <!--    <form action="/installBooks" method="get">-->
-            <!--        <button class="btn btn-secondary" type="submit">Download Books</button>-->
-            <!--    </form>-->
-            <!--</div>-->
-            <div class="col-sm-4">
-              <h2>Covid Testing</h2>
-              <p>Get tested for Covid from your own home!</p>
-                <form action="/testMe" method="get">
-                    <button class="btn btn-secondary" type="submit">Test For Covid!</button>
-                </form>
+            <div id="coughContainer">
+                <h1>Upload new File</h1>
+                    <form action = "http://localhost:5000/diagnosis" method="POST" enctype="multipart/form-data">
+                        <input class="btn btn-outline-success" type="file" name="file"/>
+<!--                            <button class="btn btn-secondary" type="file">Test For Covid!</button>-->
+                        <br>
+                        <br>
+                        <input class="btn btn-outline-success" type="submit"/>
+<!--                        <button class="btn btn-secondary" type="submit">Submit your cough</button>-->
+                    </form>
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ def after_request(response):
 @app.route("/")
 def index():
     """Home page"""
-    return render_template('index.html')
+    return render_template('homepage.html')
 
 @app.route("/diagnosis", methods = ['GET', 'POST'])
 def diagnose():
@@ -46,4 +46,4 @@ def diagnose():
 
         return render_template('diagnosis.html', val=round(negativeValue.item(), 2))
     else:
-        return render_template('index.html')
+        return render_template('homepage.html')
