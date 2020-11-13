@@ -1,4 +1,11 @@
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, render_template, request
+import torch
+import pickle
+import librosa
+import numpy as np
+
+
+model = pickle.load(open("./Models/model(L1).txt", "rb"))
 
 app = Flask(__name__)
 
@@ -15,25 +22,28 @@ def after_request(response):
 @app.route("/")
 def index():
     """Home page"""
-    return render_template("homepage.html")
+    return render_template('index.html')
 
-@app.route("/testMe", methods=["GET"])
-def storyGeneration():
-    """Testing Page"""
-    if request.method == "POST":
-        if request.method == "POST":
-            print("FORM DATA RECEIVED")
+@app.route("/diagnosis", methods = ['GET', 'POST'])
+def diagnose():
+    """Take file, process, return diagnosis"""
+    if request.method == 'POST':
+        file = request.files['file']
+        # fileName = secure_filename(file.filename)
+        # file.save(os.path.join("./FlaskUploads/", fileName))
 
-            # Make sure file exists, if not reload
-            if "file" not in request.files:
-                return redirect(request.url)
+        audio, sampleRate = librosa.load(file)
+        mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
 
-            # Make sure file has a name, if not reload
-            file = request.files["file"]
-            if file.filename == "":
-                return redirect(request.url)
+        expectedSize = 51600
 
-            # If file exists, process
-            if file:
+        soundArray = mfccs.flatten()
+        soundArray = np.pad(soundArray, (0, expectedSize - soundArray.shape[0]), 'constant')
 
-        return render_template('results.html', result=testResult)
+        prediction = model(torch.tensor(soundArray))
+
+        negativeValue = prediction[1] * 100
+
+        return render_template('diagnosis.html', val=round(negativeValue.item(), 2))
+    else:
+        return render_template('index.html')

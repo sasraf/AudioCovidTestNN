@@ -2,7 +2,7 @@ import torch
 import pickle
 import numpy as np
 
-model = pickle.load(open("../Models/model(L1).txt", "rb"))
+model = pickle.load(open("../Models/model0sPaddedAtEnd.txt", "rb"))
 inputData = pickle.load(open("coswaraInputs.txt", "rb"))
 expectedOutputs = pickle.load(open("coswaraExpectedOutputs.txt", "rb"))
 
@@ -38,7 +38,7 @@ for i in range(len(predictions)):
     actualPositive = actual[0]
     actualNegative = actual[1]
 
-    print("actual", actual[0])
+    # print("actual", actual[0])
 
     if actualPositive > actualNegative:
         positiveCount += 1
