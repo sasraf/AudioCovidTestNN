@@ -4,7 +4,6 @@ import pickle
 import librosa
 import numpy as np
 
-
 model = pickle.load(open("./Models/model(L1).txt", "rb"))
 
 app = Flask(__name__)
