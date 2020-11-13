@@ -3,8 +3,8 @@ import pickle
 import numpy as np
 
 model = pickle.load(open("../Models/model0sPaddedAtEnd.txt", "rb"))
-inputData = pickle.load(open("coswaraInputs.txt", "rb"))
-expectedOutputs = pickle.load(open("coswaraExpectedOutputs.txt", "rb"))
+inputData = pickle.load(open("../SerializedData/coswaraInputs.txt", "rb"))
+expectedOutputs = pickle.load(open("../SerializedData/coswaraExpectedOutputs.txt", "rb"))
 
 # Pad with zeroes
 maxDur = 0
@@ -38,21 +38,10 @@ for i in range(len(predictions)):
     actualPositive = actual[0]
     actualNegative = actual[1]
 
-    # print("actual", actual[0])
-
-    if actualPositive > actualNegative:
-        positiveCount += 1
-    else:
-        negativeCount += 1
-
     if positive >= negative:
         if actualPositive > actualNegative:
-            positiveAccuracy += 1
             accuracy += 1
     elif negative > positive:
         if actualNegative > actualPositive:
             accuracy += 1
-            negativeAccuracy += 1
-print("Overall Accuracy: ", accuracy/len(predictions))
-print("Positive Accuracy: ", positiveAccuracy/positiveCount)
-print("Negative Accuracy: ", negativeAccuracy/negativeCount)
+print("Accuracy: ", accuracy/len(predictions))

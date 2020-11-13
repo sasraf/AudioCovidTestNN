@@ -25,8 +25,8 @@ start = time.time()
 # while x == True:
     # x = dp.getF1Data()
 
-inputData = pickle.load(open("coswaraInputs.txt", "rb"))
-expectedOutputs = pickle.load(open("coswaraExpectedOutputs.txt", "rb"))
+inputData = pickle.load(open("../SerializedData/coswaraInputs.txt", "rb"))
+expectedOutputs = pickle.load(open("../SerializedData/coswaraExpectedOutputs.txt", "rb"))
 
 maxDur = 0
 minDur = 999999
