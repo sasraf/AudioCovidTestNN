@@ -23,8 +23,10 @@ class DataPreprocessor:
         # Key of covid statuses for turning strings from csv into integers to plug into neural network
         self.covidStatusKey = self.fillCovidStatusKey()
 
+        # Debug mode
         self.debug = debug
 
+        # Used to find longest Audio File
         self.maxDuration = 0
 
     def getInputData(self):
@@ -34,7 +36,6 @@ class DataPreprocessor:
 
     # Get all of the data from a single top level F1 folder and save it to our inputData and expectedOutputs
     # If data was retrieved, return true. Else if all data is retreived return false
-    # TODO in main: Iterate through every F1 folder by doing x = true \n while(x){ x = getF1Data } \n get input vals, get output vals
     def getF1Data(self):
 
         # If we've iterated through all the top level F! directories
@@ -54,8 +55,6 @@ class DataPreprocessor:
             start = time.time()
             print("Step: " + str(self.F1StepCount) + "/" + str(len(self.F1)))
             print("Current Path: " + currentF1Path)
-            # print("CSV Path: " + csvPath)
-            # print("F2Dirs: \n\n")
 
         self.F1StepCount += 1
 
@@ -63,8 +62,8 @@ class DataPreprocessor:
         for dirPath in F2Dirs:
             filePath = dirPath + self.audioFileName
 
-            # if self.debug:
-                # print("filePath: " + filePath)
+            if self.debug:
+                print("filePath: " + filePath)
 
             # Gets and stores mfccs of audio file
             # For any missing audio files/damaged audio files, skip
@@ -76,6 +75,7 @@ class DataPreprocessor:
                         self.maxDuration = librosa.get_duration(y=audio, sr=sampleRate)
                         print(self.maxDuration)
 
+                # Getts mfccs, appends to inputData
                 mfccs = librosa.feature.mfcc(y=audio, sr=sampleRate, n_mfcc=40)
                 self.inputData.append(mfccs)
 
@@ -100,6 +100,7 @@ class DataPreprocessor:
     def covidStatusStringToStatusArray(self, covidStatus):
         return self.covidStatusKey[covidStatus]
 
+    # Fils our key value pairs to convert our csv data values into arrays for training purposes
     def fillCovidStatusKey(self):
         key = {}
         # TODO: consider moving positive_asymp to a sign of covid negative -> focus on training ONLY for distinguishing between covid and non covid resp illnesses
@@ -110,42 +111,3 @@ class DataPreprocessor:
         for item in negative:
             key[item] = np.array([0, 1])
         return key
-
-
-
-    # TODO: get function for inputData, expectedOutput
-
-    # # NOTE: audioFileName is the name of the file we're looking at. So if we're looking at "breathing_shallow.wav" then filename = "breathing_shallow.wav"
-    #
-    # # TODO: save one folder's worth of data to inputData, expectedOutputs
-    # # Gets and saves all the data from one data folder titled "2020..."
-    # def getOneSetOfData(self, dateName):
-    #     # NOTE: dateName is the name of the data folder. Ex: "20200413"
-    #
-    #     # Clear both lists
-    #     self.inputData.clear()
-    #     self.expectedOutputs.clear()
-    #
-    #     # Save csv as a dataframe
-    #     df = pd.read_csv('/data/' + dateName + '/' + dateName + '.csv')
-    #
-    #     # Get a list of all directories in this folder (the list of all the individual people's files)
-    #     dirs = list()
-    #     dirs = next(os.walk('/data/' + dateName + '/'))[1]
-    #
-    #     # TODO traverse peoplefolders, for each person's folder add the mfcc value to inputData and get expected output value via pandas
-    #
-    #
-    #
-    #     return self.inputData, self.expectedOutputs
-    #
-    #
-    #
-    #
-    # # # TODO: save one person's worth of data to inputData, expectedOutputs
-    # # # Get the data from one person
-    # # def getOnePersonsData(self, dateName, fileName):
-    # #     # NOTE: fileName is the
-    # #     df = data
-    # #     return None
-    #

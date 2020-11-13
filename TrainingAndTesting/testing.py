@@ -3,20 +3,7 @@ import time
 import pickle
 import numpy as np
 
-# First we need to iterate through all our dataset folders. For each of the folders (let's call them F1), there is a CSV and subfolders (calle them F2).
-# Load some audio file (maybe start with the deep cough audio files first) into memory by appending its mfcc values as a single object to a list and
-# appending a set of values {x,y} to another list depending on whether the csv files say the person is positive or negative for covid. If the person is currently positive,
-# {x,y} = {1, 0}. If they're negative {x, y} = {0, 1}. For each F1, we train our model, then we clear both lists and move to the next F1 until done.
-# Once finished, we save our model and test. We'll save folder 20200525 as our testing data set
-
-
-# We repeat this for each feature that we're looking at: phonation, breathing, deep cough, shallow cough, etc
-
-# If the audio feature is missing, then don't append anything to either list
-
-# First we'll start by only training one model. Once we get that working, we'll train a few models that look at different features, then implement stacking by
-# creating a metalearner that we train over our set of audio-classifiers.
-
+# File for testing
 
 start = time.time()
 
@@ -42,11 +29,6 @@ for i in range(len(inputData)):
     inputData[i] = np.pad(inputData[i], ((0, 0), (maxDur - inputData[i].shape[1], 0)), 'constant')
     print(inputData[i].shape)
     oneDInputData.append(inputData[i].flatten())
-
-
-# device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-# ac = AudioClassifier(20, .01)
 
 
 inputData = np.array(oneDInputData)
@@ -100,7 +82,6 @@ for t in range(epochs):
     # Update weights
     optimizer.step()
 
-# ac.train(torch.tensor(inputData), torch.tensor(expectedOutputs), True)
 
 end = time.time()
 

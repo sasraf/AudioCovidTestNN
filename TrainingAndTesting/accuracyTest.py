@@ -2,11 +2,12 @@ import torch
 import pickle
 import numpy as np
 
+# Load model, data
 model = pickle.load(open("../Models/model0sPaddedAtEnd.txt", "rb"))
 inputData = pickle.load(open("../SerializedData/coswaraInputs.txt", "rb"))
 expectedOutputs = pickle.load(open("../SerializedData/coswaraExpectedOutputs.txt", "rb"))
 
-# Pad with zeroes
+# Determine longest file in our data
 maxDur = 0
 minDur = 999999
 for datum in inputData:
@@ -16,19 +17,17 @@ for datum in inputData:
 print("max = " + str(maxDur))
 print("min = " + str(minDur))
 
+# Pad all our data
 oneDInputData = list()
 for i in range(len(inputData)):
     inputData[i] = np.pad(inputData[i], ((0, 0), (maxDur - inputData[i].shape[1], 0)), 'constant')
     oneDInputData.append(inputData[i].flatten())
 
-
+# Predict outputs with our model
 predictions = model(torch.tensor(torch.tensor(np.array(oneDInputData)).float()))
 
+# Calculate accuracy
 accuracy = 0
-positiveCount = 0
-positiveAccuracy = 0
-negativeCount = 0
-negativeAccuracy = 0
 for i in range(len(predictions)):
     actual = expectedOutputs[i]
     curPrediction = predictions[i]
